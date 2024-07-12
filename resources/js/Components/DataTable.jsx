@@ -32,6 +32,11 @@ const columns = [
     selector: row => row.totalCosto,
     sortable: true,
   },
+  {
+    name: 'Insertar pago',
+    selector: row => (<TextInput></TextInput>),
+    sortable: true,
+  },
 ];
 
 const columnsProgramaPagos = [
