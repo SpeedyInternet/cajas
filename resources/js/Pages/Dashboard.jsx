@@ -22,7 +22,9 @@ export default function Dashboard({ auth }) {
                     <div className='grid grid-flow-row gap-4'>
                             <div><CardInfoEmploye cajaSeleccionada={cuentaSeleccionada} userData={auth}/></div>
                             <div><CardInfoUser/></div>
-                            <div><DataTable cuentaSeleccionada={cuentaSeleccionada}/></div>
+                            <div>
+                                <DataTable cuentaSeleccionada={cuentaSeleccionada}/>
+                            </div>
                         </div>
                     </div>
                 </div>
