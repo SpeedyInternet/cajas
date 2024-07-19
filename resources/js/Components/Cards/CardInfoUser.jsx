@@ -21,6 +21,7 @@ export default function CardInfoUser({ tipoPago, tipoCobro }) {
     const [tipoDePago, setTipoDePago] = useState( 'Tipo de Pago' );
     const [fechaTransaccion, setFechaTransaccion] = useState(formatDate(Date.now()));
 
+    const validateInput = (value) => /^\d{0,13}$/.test(value);
 
     const handleBlur = () => {
         const isValid = validarDocumento(username);
@@ -68,6 +69,7 @@ export default function CardInfoUser({ tipoPago, tipoCobro }) {
                                     isFocused={true}
                                     onChange={handleChange}
                                     onBlur={handleBlur}
+                                    validate={validateInput}
                                 />
                                 {error && <InputError message={error} className="mt-2" />}
                             </div>

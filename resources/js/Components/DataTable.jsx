@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import DataTable from 'react-data-table-component';
 import TextInput from './TextInput';
 
@@ -53,7 +53,6 @@ const customStylesPrgmDPgs = {
   },
 };
 
-// Estilos de la tabla principal
 const customStyles = {
   header: {
     style: {
@@ -83,7 +82,6 @@ const customStyles = {
   },
   rows: {
     style: {
-      // backgroundColor: '#ffffff',
       '&:not(:last-of-type)': {
         borderBottom: '1px solid #8c8c8c8c',
         borderTop: '1px solid #8c8c8c8c',
@@ -110,11 +108,11 @@ const initialData = [
     totalCosto: '15',
     expanded: true,
     deadTime: -5,
-    pagoIngresado: 0.00,
+    pagoIngresado: '0.00',
     programaDePagos: [
-      { id: 1, fecha: '2024-08-22', cantidad: 5.00, localizacion: 'Quitumbe', pagoIngresado: 0.00 },
-      { id: 2, fecha: '2024-09-22', cantidad: 5.00, localizacion: 'Cayambe', pagoIngresado: 0.00 },
-      { id: 3, fecha: '2024-10-22', cantidad: 5.00, localizacion: 'Centro histórico', pagoIngresado: 0.00 }
+      { id: 1, fecha: '2024-08-22', cantidad: 5.00, localizacion: 'Quitumbe', pagoIngresado: '0.00' },
+      { id: 2, fecha: '2024-09-22', cantidad: 5.00, localizacion: 'Cayambe', pagoIngresado: '0.00' },
+      { id: 3, fecha: '2024-10-22', cantidad: 5.00, localizacion: 'Centro histórico', pagoIngresado: '0.00' }
     ]
   },
   {
@@ -126,14 +124,14 @@ const initialData = [
     totalCosto: '13.87',
     expanded: true,
     deadTime: -5,
-    pagoIngresado: 0.00,
+    pagoIngresado: '0.00',
     programaDePagos: [
-      { id: 1, fecha: '2024-08-22', cantidad: 18.19, localizacion: 'Quitumbe', pagoIngresado: 0.00 },
-      { id: 2, fecha: '2024-09-22', cantidad: 18.19, localizacion: 'Cayambe', pagoIngresado: 0.00 },
-      { id: 3, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: 0.00 },
-      { id: 4, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: 0.00 },
-      { id: 5, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: 0.00 },
-      { id: 6, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: 0.00 }
+      { id: 1, fecha: '2024-08-22', cantidad: 18.19, localizacion: 'Quitumbe', pagoIngresado: '0.00' },
+      { id: 2, fecha: '2024-09-22', cantidad: 18.19, localizacion: 'Cayambe', pagoIngresado: '0.00' },
+      { id: 3, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: '0.00' },
+      { id: 4, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: '0.00' },
+      { id: 5, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: '0.00' },
+      { id: 6, fecha: '2024-10-22', cantidad: 18.19, localizacion: 'Centro histórico', pagoIngresado: '0.00' }
     ]
   },
   {
@@ -145,51 +143,72 @@ const initialData = [
     totalCosto: '25.45',
     expanded: true,
     deadTime: 15,
-    pagoIngresado: 0.00,
+    pagoIngresado: '0.00',
   },
 ];
 
 export default function MyDataTable() {
   const [tableData, setTableData] = useState(initialData);
 
+  const validateInput = (value) => /^\d{0,4}(\.\d{0,2})?$/.test(value);
+
   const handleInputChange = (idFactura, value) => {
-    // Validar el formato de entrada
-    const regex = /^\d*\.?\d*$/;
-    if (value === '' || regex.test(value)) {
-      // Formatear el valor
-      let formattedValue = value;
-      if (value === '') {
-        formattedValue = '0.00';
-      } else if (value.endsWith('.')) {
-        formattedValue = value + '0';
-      }
-      handleInsertPrecio(idFactura, formattedValue);
+    handleInsertPrecio(idFactura, value);
+  };
+
+  const handleFocus = (idFactura, value) => {
+    if (value === '0.00') {
+      handleInsertPrecio(idFactura, '');
+    }
+  };
+
+  const handleBlur = (idFactura, value) => {
+    if (value === '' || isNaN(parseFloat(value))) {
+      handleInsertPrecio(idFactura, '0.00');
+    } else {
+      handleInsertPrecio(idFactura, parseFloat(value).toFixed(2));
     }
   };
 
   const handleInsertPrecio = (idFactura, valorInsertado) => {
-    const parsedValue = parseFloat(valorInsertado);
-    const validValue = isNaN(parsedValue) ? parseFloat(0.00) : parsedValue;
-
     setTableData(prevData =>
       prevData.map(item => {
         if (item.id === idFactura) {
-          const numProgramas = item.programaDePagos?.length || 1;
-          const pagoPorPrograma = (validValue / numProgramas).toFixed(2);
-
           const updatedItem = {
             ...item,
-            pagoIngresado: validValue,
-            programaDePagos: item.programaDePagos?.map(pago => ({
-              ...pago,
-              pagoIngresado: parseFloat(pagoPorPrograma),
-            })) || item.programaDePagos
+            pagoIngresado: valorInsertado
           };
           return updatedItem;
         }
         return item;
       })
     );
+  };
+
+  const handleProgramPaymentChange = (idFactura, idProgram, value) => {
+    if (validateInput(value)) {
+      setTableData(prevData =>
+        prevData.map(item => {
+          if (item.id === idFactura) {
+            const updatedProgramaDePagos = item.programaDePagos.map(programa => {
+              if (programa.id === idProgram) {
+                return { ...programa, pagoIngresado: value };
+              }
+              return programa;
+            });
+
+            const totalPagoIngresado = updatedProgramaDePagos.reduce((sum, program) => sum + parseFloat(program.pagoIngresado || 0), 0).toFixed(2);
+
+            return {
+              ...item,
+              pagoIngresado: totalPagoIngresado,
+              programaDePagos: updatedProgramaDePagos
+            };
+          }
+          return item;
+        })
+      );
+    }
   };
 
   const columns = [
@@ -230,7 +249,10 @@ export default function MyDataTable() {
             id={row.id}
             className='w-28'
             value={row.pagoIngresado}
-            onChange={e => handleInputChange(row.id, e.target.value)}
+            validate={validateInput}
+            onFocus={e => handleFocus(row.id, e.target.value)}
+            onChange={e => row.programaDePagos? handleInputChange(row.id, e.target.value):console.log('No hace cambios')}
+            onBlur={e => handleBlur(row.id, e.target.value)}
           />
         </div>
       ),
@@ -265,7 +287,9 @@ export default function MyDataTable() {
           <TextInput
             className='w-full h-6'
             value={row.pagoIngresado}
-            readOnly
+            validate={validateInput}
+            onChange={e => handleProgramPaymentChange(row.facturaId, row.id, e.target.value)}
+            // onBlur={e => handleProgramPaymentChange(row.facturaId, row.id, e.target.value)}
           />
         </div>
       ),
@@ -273,34 +297,30 @@ export default function MyDataTable() {
   ];
 
   useEffect(() => {
-    // Establecer todas las filas como expandidas por defecto
     setTableData(prevData => prevData.map(item => ({ ...item, expanded: true })));
   }, []);
 
   const expandedComponent = ({ data }) => (
-  <>
     <div className="grid grid-cols-10 p-2 gap-5 bg-slate-400 rounded-es-2xl rounded-ee-2xl shadow-2xl font-averta">
-        { data.programaDePagos && data.programaDePagos.length > 0 ? (
-          <>
-            <div className='col-span-2'>
-              <div className='flex items-center justify-center h-28 text-white font-bold'>
-                <p className=' rounded-xl p-2'>PROGRAMA DE PAGOS</p>
-              </div>
+      {data.programaDePagos && data.programaDePagos.length > 0 ? (
+        <>
+          <div className='col-span-2'>
+            <div className='flex items-center justify-center h-28 text-white font-bold'>
+              <p className=' rounded-xl p-2'>PROGRAMA DE PAGOS</p>
             </div>
-            <div className='grid col-span-6 bg-slate-400 rounded-xl shadow-lg'>
-              <DataTable
-                columns={columnsProgramaPagos}
-                data={ data.programaDePagos }
-                customStyles={ customStylesPrgmDPgs }
-              />
-            </div>
-          </>
-        ) : (
-          <div className=''></div>
-        )}
-      </div>
-      {/* <div className='h-2'></div> */}
-  </>
+          </div>
+          <div className='grid col-span-6 bg-slate-400 rounded-xl shadow-lg'>
+            <DataTable
+              columns={ columnsProgramaPagos }
+              data={data.programaDePagos.map(programa => ({ ...programa, facturaId: data.id }))}
+              customStyles={ customStylesPrgmDPgs }
+            />
+          </div>
+        </>
+      ) : (
+        <div className=''></div>
+      )}
+    </div>
   );
 
   return (
@@ -310,10 +330,10 @@ export default function MyDataTable() {
         data={tableData}
         expandableRows
         expandableRowsComponent={expandedComponent}
-        expandableRowExpanded={() => true } // Siempre devuelve true para mantener todas las filas expandidas
-        expandableRowsHideExpander={ true }
+        expandableRowExpanded={() => true}
+        expandableRowsHideExpander={true}
         pagination={tableData.length > 5}
-        customStyles={ customStyles }
+        customStyles={customStyles}
       />
     </div>
   );
