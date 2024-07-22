@@ -3,18 +3,18 @@ const validarDocumento = (numero) => {
 
    // Verificar que el campo no contenga letras
    if (!/^\d+$/.test(numero)) {
-      return 'No puede ingresar caracteres en el número';
+      return {success: false, msg:'No puede ingresar caracteres en el número'};
    }
 
-   if (numero.length < 10) {
-      return 'El número ingresado no es válido';
+   if (numero.length < 10) {      
+      return {success: false, msg:'El número ingresado no es válido'};
    }
 
    // Los primeros dos dígitos corresponden al código de la provincia
    const numeroProvincias = 22;
    const provincia = parseInt(numero.substr(0, 2), 10);
    if (provincia < 1 || provincia > numeroProvincias) {
-      return 'El código de la provincia (dos primeros dígitos) es inválido';
+      return {success: false, msg:'El código de la provincia (dos primeros dígitos) es inválido'};
    }
 
    // Almacenar los dígitos del documento en variables
@@ -31,7 +31,7 @@ const validarDocumento = (numero) => {
 
    // Validar el tercer dígito
    if (d3 === 7 || d3 === 8) {
-      return 'El tercer dígito ingresado es inválido';
+      return {success: false, msg:'El tercer dígito ingresado es inválido'};
    }
 
    let suma;
@@ -69,10 +69,10 @@ const validarDocumento = (numero) => {
 
       digitoVerificador = suma % modulo === 0 ? 0 : modulo - suma % modulo;
       if (digitoVerificador !== d9) {
-         return 'El ruc de la empresa del sector público es incorrecto.';
+         return {success: false, msg:'El ruc incorrecto'};
       }
       if (numero.substr(9, 4) !== '0001') {
-         return 'El ruc de la empresa del sector público debe terminar con 0001';
+         return {success: false, msg:'El ruc incorrecto debe terminar con 0001'};
       }
       return true;
    } else if (d3 === 9) {
@@ -92,10 +92,10 @@ const validarDocumento = (numero) => {
 
       digitoVerificador = suma % modulo === 0 ? 0 : modulo - suma % modulo;
       if (digitoVerificador !== d10) {
-         return 'El ruc de la empresa del sector privado es incorrecto.';
+         return {success: false, msg:'El ruc incorrecto'};
       }
       if (numero.substr(10, 3) !== '001') {
-         return 'El ruc de la empresa del sector privado debe terminar con 001';
+         return {success: false, msg:'El ruc debe terminar con 001'};
       }
       return true;
    }
@@ -104,13 +104,13 @@ const validarDocumento = (numero) => {
    digitoVerificador = residuo === 0 ? 0 : modulo - residuo;
 
    if (digitoVerificador !== d10) {
-      return 'El número de cédula de la persona natural es incorrecto.';
+      return {success: false, msg:'El número de cédula es incorrecto.'};
    }
    if (numero.length > 10 && numero.substr(10, 3) !== '001') {
-      return 'El ruc de la persona natural debe terminar con 001';
+      return {success: false, msg:'El ruc debe terminar con 001.'};
    }
 
-   return true;
+   return {success: true, msg:'Identificación correcta.'};
 };
 
 export default validarDocumento;
