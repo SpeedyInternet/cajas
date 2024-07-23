@@ -5,7 +5,7 @@ import InputError from '../InputError';
 import validarDocumento from '@/Providers/InputValidators'; // Ajusta esta ruta según sea necesario
 
 export default function CardInfoEmploye({ cajaSeleccionada, userData }) {
-    const [cajaAtiende, setCajaAtiende] = useState(cajaSeleccionada || ''); // Inicializar con cajaSeleccionada
+    // const [cajaAtiende, setCajaAtiende] = useState(cajaSeleccionada || ''); // Inicializar con cajaSeleccionada
     const [user, setUse] = useState(userData.user || 'Aun no se obtiene el usuario'); // Inicializar con la autenticación del usuario
     const [error, setError] = useState('');
 
@@ -51,7 +51,7 @@ export default function CardInfoEmploye({ cajaSeleccionada, userData }) {
                                         id="cajaAtiende"
                                         type="text"
                                         name="cajaAtiende"
-                                        value={ cajaAtiende }
+                                        value={ cajaSeleccionada }
                                         className="mt-1 block w-full font-averta bg-primary-second/50"
                                         autoComplete="cajaAtiende"
                                         isFocused={ false }

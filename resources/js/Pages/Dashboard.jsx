@@ -5,6 +5,9 @@ import CardInfoUser from '@/Components/Cards/CardInfoUser';
 import CardInfoEmploye from '@/Components/Cards/CardInfoEmploye';
 import { useEffect, useState } from 'react';
 import TotalFactura from '@/Components/Cards/TotalFactura';
+import Swal from 'sweetalert2';
+import DataTableSkeleton from '@/Components/Skeletons/DataTableSkeleton';
+
 const initialData = [
   {
     id: 3,
@@ -55,14 +58,72 @@ const initialData = [
 ];
 
 export default function Dashboard({ auth }) {
-  const [cuentaSeleccionada, setCuentaSeleccionada] = useState('CAJA AROSEMA TOLA_CAJA AROSEMA TOLA_1234');
+  const [cuentaSeleccionada, setCuentaSeleccionada] = useState('');
   const [identificacionCliente, setIdentificacionCliente] = useState('');
-  const [initialDataTable, setInitialDataTable] = useState(initialData);
+  const [initialDataTable, setInitialDataTable] = useState([]);
   const [totalFactura, setTotalFactura] = useState(0);
+  const [datosCargados, setDatosCargados] = useState({});
+// hooks para carga de datos
+  const [loading, setLoading] = useState(true);
 
-  const handleIdentificacionChange = (newIdentificacion) => {
-    setIdentificacionCliente(newIdentificacion);
+  const handleIdentificacionChange = (found) => {
+    setDatosCargados(found);
   };
+  const cargarDatos = async () => {
+    console.log(datosCargados);
+    if (datosCargados) {
+      // Simular la carga de datos
+      await new Promise(resolve => setTimeout(resolve, 10000)); // Esperar 10 segundos
+      setInitialDataTable(initialData); // Usa tus datos reales aquí
+      setLoading(false);
+    }
+  };
+  useEffect(() => {
+
+    cargarDatos();
+  }, [datosCargados]);
+  
+  useEffect(() => {
+    const mostrarSweetAlert = async () => {
+      const { value: seleccion } = await Swal.fire({
+        title: 'Selecciona la caja de cobros',
+        input: 'select',
+        inputOptions: {
+          'CAJA AROSEMA TOLA_CAJA AROSEMA TOLA_1234': 'Caja Arosema Tola',
+          'OTRA_OPCION': 'Otra Opción'
+        },
+        inputPlaceholder: 'Selecciona la caja de cobros',
+        showCancelButton: false,
+        allowOutsideClick: false,
+        allowEscapeKey: false,
+        inputValidator: (value) => {
+          return new Promise((resolve) => {
+            if (value) {
+              resolve();
+            } else {
+              resolve('Debes seleccionar la caja');
+            }
+          });
+        },
+      });
+
+      if (seleccion) {
+        const { value: validacion } = await Swal.fire({
+          html: `<b>Seleccionaste</b> \n <div>${seleccion}</div>`,
+          showCancelButton: true,
+          allowOutsideClick: false,
+          allowEscapeKey: false,
+        });
+        if (validacion) {
+          setCuentaSeleccionada(seleccion);
+        } else {
+          mostrarSweetAlert();
+        }
+      }
+    };
+
+    mostrarSweetAlert();
+  }, []);
 
   useEffect(() => {
     console.log('Identificación del cliente:', identificacionCliente);
@@ -75,6 +136,44 @@ export default function Dashboard({ auth }) {
   const handleTotalChange = (newTotal) => {
     setTotalFactura(newTotal);
   };
+
+  const handleRegistrarPago = async () => {
+    const detallesFactura = initialDataTable.map(factura => 
+      factura.pagoIngresado>0?
+      `
+      <b classname='p-3'>Factura:</b> ${factura.factura}<br/>
+      <b>Localización:</b> ${factura.localizacion}<br/>
+      <b>Fecha:</b> ${factura.fecha}<br/>
+      <b>Monto:</b> ${factura.monto}<br/>
+      <b>Pago Ingresado:</b> ${factura.pagoIngresado}<br/><br/>
+    `:'').join('');
+
+    const { value: confirmacion } = await Swal.fire({
+      title: 'Confirmar Ingreso de Pago',
+      html: `
+        <div>
+          ${detallesFactura}
+          <b>Total a pagar:</b> ${totalFactura.toFixed(2)} $
+        </div>
+      `,
+      showCancelButton: true,
+      confirmButtonText: 'Confirmar',
+      cancelButtonText: 'Cancelar',
+      allowOutsideClick: false,
+      allowEscapeKey: false,
+    });
+
+    if (confirmacion) {
+      // Lógica para registrar el pago
+      console.log('Pago confirmado');
+    } else {
+      console.log('Pago cancelado');
+    }
+  };
+
+  if (!cuentaSeleccionada) {
+    return null; // O puedes mostrar un spinner de carga aquí
+  }
 
   return (
     <AuthenticatedLayout
@@ -92,11 +191,18 @@ export default function Dashboard({ auth }) {
                   <CardInfoUser onIdentificacionChange={handleIdentificacionChange} />
                 </div>
                 <div className='col-span-2'>
-                  <TotalFactura total={totalFactura} />
+                  <TotalFactura total={totalFactura} onRegistrarPago={handleRegistrarPago} />
                 </div>
               </div>
               <div>
-                <MyDataTable setFacturas={initialDataTable} setInitialData={setInitialDataTable} onTotalChange={handleTotalChange} />
+                {datosCargados.success === true ? (
+                  loading?
+                  (<DataTableSkeleton /> )
+                  :
+                  (<MyDataTable setFacturas={initialDataTable} setInitialData={setInitialDataTable} onTotalChange={handleTotalChange} />)
+                ) : (
+                  <></>
+                )}
               </div>
             </div>
           </div>

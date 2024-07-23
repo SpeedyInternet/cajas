@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import DangerButton from "../DangerButton";
 
-export default function TotalFactura({ total }) {
-    // const [totalFactura, setTotalFactura] = useState(total);
+export default function TotalFactura({ total, onRegistrarPago }) {
     return (
         <>
             <article className="relative rounded-xl p-4 bg-neutral-white/70 sm:p-6 lg:p-3 font-averta h-full shadow-xl flex flex-col items-center justify-center select-none ">
@@ -17,7 +16,7 @@ export default function TotalFactura({ total }) {
                     {Number(total).toFixed(2)} $
                 </div>
                 <div className="flex items-center justify-center font-averta">
-                    <DangerButton className="ml-4 font-averta bg-" disabled={true}>
+                    <DangerButton className="ml-4 font-averta bg-" onClick={onRegistrarPago}>
                         Registrar pago
                     </DangerButton>
                 </div>
