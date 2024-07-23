@@ -372,7 +372,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import DataTable from 'react-data-table-component';
 import TextInput from './TextInput';
 
-export default function MyDataTable({ setFacturas, setInitialData }) {
+export default function MyDataTable({ setFacturas, setInitialData, onTotalChange }) {
   const [tableData, setTableData] = useState(setFacturas);
   const [inputValues, setInputValues] = useState({});
   const focusedInputRef = useRef(null);
@@ -498,6 +498,21 @@ export default function MyDataTable({ setFacturas, setInitialData }) {
       }
     }
   }, [inputValues, tableData]);
+
+  useEffect(() => {
+    let sumatoria = 0;
+    tableData?.forEach(factura => {
+      sumatoria += parseFloat(factura.pagoIngresado) || 0;
+    });
+    onTotalChange(sumatoria);
+    if (focusedInputRef.current) {
+      const { idFactura, idProgram } = focusedInputRef.current;
+      const inputElement = document.getElementById(`input-${idFactura}-${idProgram}`);
+      if (inputElement) {
+        inputElement.focus();
+      }
+    }
+  }, [tableData, onTotalChange]);
 
   const columns = [
     {
