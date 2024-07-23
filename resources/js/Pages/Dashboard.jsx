@@ -69,18 +69,19 @@ export default function Dashboard({ auth }) {
   const handleIdentificacionChange = (found) => {
     setDatosCargados(found);
   };
-  const cargarDatos = async () => {
-    console.log(datosCargados);
-    if (datosCargados) {
-      // Simular la carga de datos
-      await new Promise(resolve => setTimeout(resolve, 10000)); // Esperar 10 segundos
-      setInitialDataTable(initialData); // Usa tus datos reales aquí
-      setLoading(false);
-    }
-  };
+  
   useEffect(() => {
-
-    cargarDatos();
+    console.log(datosCargados);
+    console.log(loading);
+    if (datosCargados.success) {
+      // Simular la carga de datos
+      setTimeout(() => {
+        setInitialDataTable(initialData); // Usa tus datos reales aquí
+        setLoading(false);
+      }, 5000); // Simular un retraso de 10 segundos
+    }else{
+      setLoading(true); // Usa tus datos reales aquí
+    }
   }, [datosCargados]);
   
   useEffect(() => {
@@ -141,13 +142,16 @@ export default function Dashboard({ auth }) {
     const detallesFactura = initialDataTable.map(factura => 
       factura.pagoIngresado>0?
       `
-      <b classname='p-3'>Factura:</b> ${factura.factura}<br/>
+      <b>Factura:</b> ${factura.factura}<br/>
       <b>Localización:</b> ${factura.localizacion}<br/>
       <b>Fecha:</b> ${factura.fecha}<br/>
       <b>Monto:</b> ${factura.monto}<br/>
       <b>Pago Ingresado:</b> ${factura.pagoIngresado}<br/><br/>
     `:'').join('');
 
+    if(initialData){
+      
+    }
     const { value: confirmacion } = await Swal.fire({
       title: 'Confirmar Ingreso de Pago',
       html: `
