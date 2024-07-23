@@ -12,8 +12,8 @@ export default function DataTableSkeleton() {
       <strong className="px-3 py-1.5 text-[20px] font-medium text-white" />
       <div className='rounded-xl shadow-2xl'>
         <div className='h-2'></div>
-        <div className="animate-pulse">
-          <div className="h-2 p-2"></div>
+        <div className="animate-pulse p-3">
+          <div className="h-2 p-4"></div>
           {[...Array(3)].map((_, index) => (
             <>
             <div key={index} className="flex space-x-4 mb-4">
@@ -41,6 +41,7 @@ export default function DataTableSkeleton() {
                 ))}
               </div>
             </div>
+            <div className='h-3 '></div>
             </>
           ))}
         </div>

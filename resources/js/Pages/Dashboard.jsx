@@ -165,7 +165,15 @@ export default function Dashboard({ auth }) {
       cancelButtonText: 'Cancelar',
       allowOutsideClick: false,
       allowEscapeKey: false,
-    });
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Ingresado!",
+          text: "El pago ha sido ingresado.",
+          icon: "success"
+        });
+      }
+    });;
 
     if (confirmacion) {
       // Lógica para registrar el pago
