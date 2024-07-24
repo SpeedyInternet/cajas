@@ -175,6 +175,11 @@ export default function MyDataTable({ setFacturas, setInitialData, onTotalChange
       sortable: true,
     },
     {
+      name: 'Abonado',
+      selector: row => (Number(row.monto) + (Number(row.monto) * 0.15)).toFixed(2)-10,
+      sortable: true,
+    },
+    {
       name: 'Ingresar pago',
       cell: row => (
         <div className='p-2'>

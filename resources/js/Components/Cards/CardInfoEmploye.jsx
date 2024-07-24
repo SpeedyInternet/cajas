@@ -51,7 +51,7 @@ export default function CardInfoEmploye({ cajaSeleccionada, userData }) {
                                         id="cajaAtiende"
                                         type="text"
                                         name="cajaAtiende"
-                                        value={ cajaSeleccionada }
+                                        value={ cajaSeleccionada.name }
                                         className="mt-1 block w-full font-averta bg-primary-second/50"
                                         autoComplete="cajaAtiende"
                                         isFocused={ false }

@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import TotalFactura from '@/Components/Cards/TotalFactura';
 import Swal from 'sweetalert2';
 import DataTableSkeleton from '@/Components/Skeletons/DataTableSkeleton';
+import { usePage } from '@inertiajs/react';
 
 const initialData = [
   {
@@ -63,8 +64,11 @@ export default function Dashboard({ auth }) {
   const [initialDataTable, setInitialDataTable] = useState([]);
   const [totalFactura, setTotalFactura] = useState(0);
   const [datosCargados, setDatosCargados] = useState({});
-// hooks para carga de datos
+  // hooks para carga de datos
   const [loading, setLoading] = useState(true);
+
+  // Datos para el combobox de bancos y datos de facturas
+  const { bankAccounts } = usePage().props;
 
   const handleIdentificacionChange = (found) => {
     setDatosCargados(found);
@@ -86,13 +90,20 @@ export default function Dashboard({ auth }) {
   
   useEffect(() => {
     const mostrarSweetAlert = async () => {
+      // Mapeo para el input de cajas
+      console.log(bankAccounts['original']['bankAccounts']);
+      const listaCajas = bankAccounts['original']['bankAccounts'];
+      const inputOptionsCajas = listaCajas.reduce((options, account) => {
+        options[account.c_bankaccount_id] = account.name;
+        return options;
+      }, {});
+
+      console.log(inputOptionsCajas);
+
       const { value: seleccion } = await Swal.fire({
         title: 'Selecciona la caja de cobros',
         input: 'select',
-        inputOptions: {
-          'CAJA AROSEMA TOLA_CAJA AROSEMA TOLA_1234': 'Caja Arosema Tola',
-          'OTRA_OPCION': 'Otra Opción'
-        },
+        inputOptions: {...inputOptionsCajas},
         inputPlaceholder: 'Selecciona la caja de cobros',
         showCancelButton: false,
         allowOutsideClick: false,
@@ -107,16 +118,19 @@ export default function Dashboard({ auth }) {
           });
         },
       });
-
+      // Rebuscar la caja seleccionada
+      const selectedAccount = listaCajas.find(account => account.c_bankaccount_id === seleccion);
+      console.log(selectedAccount);
       if (seleccion) {
+        console.log('Seleccionaste: '+seleccion);
         const { value: validacion } = await Swal.fire({
-          html: `<b>Seleccionaste</b> \n <div>${seleccion}</div>`,
+          html: `<b>Seleccionaste</b> \n <div>${selectedAccount.name}</div>`,
           showCancelButton: true,
           allowOutsideClick: false,
           allowEscapeKey: false,
         });
         if (validacion) {
-          setCuentaSeleccionada(seleccion);
+          setCuentaSeleccionada({...selectedAccount});
         } else {
           mostrarSweetAlert();
         }
