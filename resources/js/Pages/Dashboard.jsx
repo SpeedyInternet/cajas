@@ -187,7 +187,7 @@ export default function Dashboard({ auth }) {
           icon: "success"
         });
       }
-    });;
+    });
 
     if (confirmacion) {
       // Lógica para registrar el pago
