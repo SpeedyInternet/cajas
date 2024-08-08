@@ -8,15 +8,25 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
         './resources/js/**/*.jsx',
-        
+
     ],
 
     theme: {
         extend: {
+            keyframes: {
+                fadeIn: {
+                    '0%': { opacity: 0 },
+                    '100%': { opacity: 1 },
+                },
+                fadeOut: {
+                    '0%': { opacity: 1 },
+                    '100%': { opacity: 0 },
+                },
+            },
             colors: {
                 primary: {
-                    main:'#0E378A',
-                    second:'#C4CDE3',
+                    main: '#0E378A',
+                    second: '#C4CDE3',
                     dark: '#001f54',
                     medium: '#0063b2',
                     light: '#00a4cc',
@@ -32,6 +42,10 @@ export default {
                 sans: ['Figtree', ...defaultTheme.fontFamily.sans],
             },
         },
+        animation: {
+            fadeIn: 'fadeIn 0.5s ease-in-out',
+            fadeOut: 'fadeOut 0.5s ease-in-out',
+          },    
     },
 
     plugins: [forms],

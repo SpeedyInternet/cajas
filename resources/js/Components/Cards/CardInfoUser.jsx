@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import TextInput from '@/Components/TextInput';
 import InputLabel from '../InputLabel';
 import InputError from '../InputError';
-import validarDocumento from '@/Providers/InputValidators'; // Ajusta esta ruta según sea necesario
 import TextInputWithButton from "../TextInputWithButton";
 import { FaSearch, FaDollarSign } from 'react-icons/fa';
 import Checkbox from "../Checkbox";
@@ -27,8 +26,6 @@ export default function CardInfoUser({ onIdentificacionChange }) {
     });
     const [fechaTransaccion, setFechaTransaccion] = useState(formatDate(Date.now()));
 
-    const validateInput = (value) => /^\d{0,13}$/.test(value);
-
     const handleSelect = (e) => {
         const { name, checked } = e.target;
         setTipoDePago((prev) => ({
@@ -42,19 +39,19 @@ export default function CardInfoUser({ onIdentificacionChange }) {
         const onlyNumbers = value.replace(/\D/g, '');
         setIdentificacionCliente(onlyNumbers);
         simulateUserSearch(onlyNumbers);
-        if (value === '' || !error.success) {
-            onIdentificacionChange({ success: false, identificacion: onlyNumbers }); // Enviar false al componente padre
+        if (value === '') {
+            onIdentificacionChange({ success: false, identificacion: onlyNumbers });
         }
     };
 
     const simulateUserSearch = (identificacion) => {
         console.log('Simulando búsqueda de usuario con identificación:', identificacion);
-        if (identificacion === '1313401117' && error.success) {
+        if (identificacion === '1313401117') {
             setCliente('Jorge Ibarra');
-            onIdentificacionChange({ success: true, identificacion }); // Enviar true al componente padre
+            onIdentificacionChange({ success: true, identificacion });
         } else {
             setCliente('');
-            onIdentificacionChange({ success: false, identificacion }); // Enviar false al componente padre
+            onIdentificacionChange({ success: false, identificacion });
         }
     };
 
@@ -65,7 +62,7 @@ export default function CardInfoUser({ onIdentificacionChange }) {
     };
 
     useEffect(() => {
-        setError(validarDocumento(identificacionCliente));
+        setError('');
     }, [identificacionCliente]);
 
     return (
@@ -184,7 +181,7 @@ function PaymentOption({ label, name, checked, onChange, icon }) {
                 </label>
             </div>
             {checked && (
-                <div className="mt-2 transition-opacity duration-300 ease-in-out ">
+                <div className={`mt-2 transition-all duration-300 ease-in-out transform ${checked ? 'opacity-100 scale-100 animate-fadeIn' : 'opacity-0 scale-95'}`}>
                     <TextInputWithButton
                         classNameButton="bg-white text-green-500 "
                         icon={icon}
